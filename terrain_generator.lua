@@ -29,28 +29,26 @@ function TerrainGenerator:Init()
     Print("[D] Cloning child voxel mesh to zmap[" .. step .. "].")
     self.zmap[step] = z0:Clone()
   end
-
+  
   for x = 0, 64 do
     for y = 0, 64 do
       -- The desired height at (x, y).
       -- In this example, we simply draw circular steps.
-      local h = math.floor(math.sqrt((R.z*x)^2 + (R.z*y)^2))
-      h = h - h % R.z  -- rown down to the correct resolution
+      local height = math.floor(math.sqrt((R.z*x)^2 + (R.z*y)^2))
+      -- Round down to match one of the interleaved voxel meshes.
+      height = height - height % R.z
 
-      --Print("(x, y, z): (" .. x .. "," .. y .. "," .. h .. ")")
-      local offset = h % S
-      -- Select the voxel mesh that will contain this column:
-      local mesh = self.zmap[offset]
+      -- Select the voxel mesh that will contain this column.
+      local mesh = self.zmap[height % S]
 
-      --mesh:SetVoxel(Vector.New(S*x, S*y, h), self.properties.grass)
-      for z = 0, h, S do
+      for z = 0, height, S do
         mesh:SetVoxel(Vector.New(S*x, S*y, z), self.properties.grass)
       end
     end
   end
   
   for step, mesh in pairs(self.zmap) do
-    -- Once the pixels are set, change the relative position of each sub-mesh:
+    -- Once the pixels are set, change the relative position of each sub-mesh.
     mesh:SetRelativePosition(R*(step / R.z))
   end
 
