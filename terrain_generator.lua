@@ -38,12 +38,7 @@ function TerrainGenerator:Init()
             -- Round down to match one of the interleaved voxel meshes.
             height = height - height % R.z
 
-            -- Select the voxel mesh that will contain this column.
-            local mesh = self.zmap[height % S]
-
-            for z = 0, height, S do
-                mesh:SetVoxel(Vector.New(S * x, S * y, z), self.properties.grass)
-            end
+            self:DrawColumn(Vector.New(S * x, S * y, height))
         end
     end
 
@@ -53,6 +48,16 @@ function TerrainGenerator:Init()
     end
 
     Print("[D] " .. vm:GetName() .. " all set!")
+end
+
+function TerrainGenerator:DrawColumn(v)
+    -- Select the voxel mesh that will contain this column.
+    local mesh = self.zmap[v.z % S]
+
+    -- Draw each voxel (bottom-up) in the current column.
+    for z = 0, v.z, S do
+        mesh:SetVoxel(Vector.New(v.x, v.y, z), self.properties.grass)
+    end
 end
 
 return TerrainGenerator
